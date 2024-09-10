@@ -26,7 +26,7 @@ const CustomizedContent = (props) => {
         stroke="#fff"
         strokeWidth={2 / (depth + 1e-10)}
         strokeOpacity={1 / (depth + 1e-10)}
-        style={{ cursor: 'pointer' }}
+        className="cursor-pointer transition-all hover:brightness-110"
       />
       {depth === 1 && (
         <text
@@ -35,7 +35,7 @@ const CustomizedContent = (props) => {
           textAnchor="middle"
           fill="#fff"
           fontSize={14}
-          style={{ pointerEvents: 'none' }}
+          className="pointer-events-none"
         >
           {name}
         </text>
@@ -48,8 +48,8 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white p-2 border border-gray-300 rounded shadow">
-        <p>{`${data.name}: ${data.size}`}</p>
+      <div className="bg-leaf-light p-2 border border-leaf rounded shadow">
+        <p className="text-leaf-dark">{`${data.name}: ${data.size}`}</p>
       </div>
     );
   }
@@ -68,9 +68,9 @@ const TreemapVisualization = ({ data }) => {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Content Aspiration Visualization</h2>
-      <div style={{ width: '100%', height: 400 }}>
+    <Card className="p-6 bg-leaf-light border-leaf">
+      <h2 className="text-2xl font-semibold mb-4 text-leaf-dark">Content Aspiration Visualization</h2>
+      <div className="w-full h-[400px]">
         <ResponsiveContainer>
           <Treemap
             data={[transformedData]}
