@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,18 +6,13 @@ import { Card } from "@/components/ui/card";
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-const BACKEND_URL = 'http://localhost:5000'; // Update this if your backend is running on a different port
+const BACKEND_URL = 'http://localhost:5000';
 
-const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
+const ContentAspirationForm = ({ onSubmit }) => {
   const [tone, setTone] = useState('');
   const [style, setStyle] = useState('');
-  const [interests, setInterests] = useState('');
-
-  useEffect(() => {
-    if (uploadedContent) {
-      setInterests(uploadedContent);
-    }
-  }, [uploadedContent]);
+  const [creatorContent, setCreatorContent] = useState('');
+  const [channelContent, setChannelContent] = useState('');
 
   const processInputMutation = useMutation({
     mutationFn: (data) => 
@@ -39,12 +34,23 @@ const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
     },
   });
 
+  const handleFileUpload = (event, setContent) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setContent(e.target.result);
+      };
+      reader.readAsText(file);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = {
       user_id: 'user123', // Replace with actual user ID
-      creator_text: `${tone} ${style}`,
-      content_text: interests,
+      creator_text: `${tone} ${style}\n${creatorContent}`,
+      content_text: channelContent,
     };
     processInputMutation.mutate(data, {
       onSuccess: (data) => {
@@ -79,12 +85,22 @@ const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
           />
         </div>
         <div>
-          <label htmlFor="interests" className="block text-sm font-medium text-gray-700 mb-1">Content Interests</label>
-          <Textarea
-            id="interests"
-            value={interests}
-            onChange={(e) => setInterests(e.target.value)}
-            placeholder="Describe your main content interests and topics"
+          <label htmlFor="creatorFile" className="block text-sm font-medium text-gray-700 mb-1">Upload Creator File</label>
+          <Input
+            id="creatorFile"
+            type="file"
+            accept=".txt"
+            onChange={(e) => handleFileUpload(e, setCreatorContent)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="channelFile" className="block text-sm font-medium text-gray-700 mb-1">Upload Channel File</label>
+          <Input
+            id="channelFile"
+            type="file"
+            accept=".txt"
+            onChange={(e) => handleFileUpload(e, setChannelContent)}
             required
           />
         </div>
