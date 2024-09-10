@@ -6,6 +6,53 @@
 
 **URL**: https://run.gptengineer.app/projects/5d8cd7ec-38fd-41b7-852f-4240d94815ad/improve
 
+## How to run the project
+
+### Backend
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Install the required Python packages:
+   ```
+   pip install -r requirements.txt
+   ```
+
+3. Set up your `.env` file in the backend directory with the following content:
+   ```
+   DB_USER=your_database_user
+   DB_PASSWORD=your_database_password
+   DB_HOST=your_database_host
+   DB_NAME=your_database_name
+   OPENAI_API_KEY=your_openai_api_key
+   ```
+
+4. Run the backend server:
+   ```
+   python app.py
+   ```
+
+### Frontend
+
+1. Navigate back to the project root directory:
+   ```
+   cd ..
+   ```
+
+2. Install the necessary dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm run dev
+   ```
+
+4. Open your browser and visit `http://localhost:5173` to view the application.
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
@@ -54,12 +101,14 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - React
 - shadcn-ui
 - Tailwind CSS
+- Flask (Backend)
+- PostgreSQL (Database)
 
 ## How can I deploy this project?
 
