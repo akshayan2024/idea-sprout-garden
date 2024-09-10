@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 const BACKEND_URL = 'http://localhost:5000';
@@ -11,8 +11,8 @@ const BACKEND_URL = 'http://localhost:5000';
 const ContentAspirationForm = ({ onSubmit }) => {
   const [tone, setTone] = useState('');
   const [style, setStyle] = useState('');
-  const [creatorContent, setCreatorContent] = useState('');
-  const [channelContent, setChannelContent] = useState('');
+  const [creatorFile, setCreatorFile] = useState(null);
+  const [channelFile, setChannelFile] = useState(null);
 
   const processInputMutation = useMutation({
     mutationFn: (data) => 
@@ -34,24 +34,30 @@ const ContentAspirationForm = ({ onSubmit }) => {
     },
   });
 
-  const handleFileUpload = (event, setContent) => {
+  const handleFileChange = (event, setFile) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setContent(e.target.result);
-      };
-      reader.readAsText(file);
+      setFile(file);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!creatorFile || !channelFile) {
+      toast.error('Please upload both creator and channel files.');
+      return;
+    }
+
+    const creatorContent = await creatorFile.text();
+    const channelContent = await channelFile.text();
+
     const data = {
       user_id: 'user123', // Replace with actual user ID
       creator_text: `${tone} ${style}\n${creatorContent}`,
       content_text: channelContent,
     };
+
     processInputMutation.mutate(data, {
       onSuccess: (data) => {
         onSubmit(data);
@@ -90,7 +96,7 @@ const ContentAspirationForm = ({ onSubmit }) => {
             id="creatorFile"
             type="file"
             accept=".txt"
-            onChange={(e) => handleFileUpload(e, setCreatorContent)}
+            onChange={(e) => handleFileChange(e, setCreatorFile)}
             required
           />
         </div>
@@ -100,7 +106,7 @@ const ContentAspirationForm = ({ onSubmit }) => {
             id="channelFile"
             type="file"
             accept=".txt"
-            onChange={(e) => handleFileUpload(e, setChannelContent)}
+            onChange={(e) => handleFileChange(e, setChannelFile)}
             required
           />
         </div>
