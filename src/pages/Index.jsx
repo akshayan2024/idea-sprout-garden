@@ -14,17 +14,17 @@ const Index = () => {
   const [userDictionary, setUserDictionary] = useState(null);
 
   useEffect(() => {
-    // Simulating a check for existing user session
     const checkUserSession = async () => {
       try {
-        // Replace this with actual API call to check user session
         const response = await fetch('http://localhost:5000/check-session', {
           credentials: 'include'
         });
         if (response.ok) {
-          const userData = await response.json();
-          setIsLoggedIn(true);
-          setUserProfile(userData.profile);
+          const data = await response.json();
+          if (data.isAuthenticated) {
+            setIsLoggedIn(true);
+            setUserProfile(data.profile);
+          }
         }
       } catch (error) {
         console.error('Error checking user session:', error);
@@ -35,8 +35,9 @@ const Index = () => {
   }, []);
 
   const handleLogin = async (userData) => {
+    // This is a placeholder. In a real app, you'd make an API call to log in
     setIsLoggedIn(true);
-    setUserProfile(userData.profile);
+    setUserProfile(userData); // Assume userData contains the profile information
   };
 
   const handleContentAspirationSubmit = (data) => {

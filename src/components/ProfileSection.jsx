@@ -9,6 +9,10 @@ const ProfileSection = ({ userProfile }) => {
     console.log('Logout clicked');
   };
 
+  if (!userProfile) {
+    return null; // Don't render anything if userProfile is null
+  }
+
   return (
     <div className="absolute top-4 right-4">
       <DropdownMenu>
@@ -16,13 +20,13 @@ const ProfileSection = ({ userProfile }) => {
           <Button variant="ghost" className="h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
               <AvatarImage src={userProfile.avatarUrl} alt={userProfile.name} />
-              <AvatarFallback>{userProfile.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{userProfile.name ? userProfile.name.charAt(0) : '?'}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="font-medium">{userProfile.name}</DropdownMenuItem>
-          <DropdownMenuItem>{userProfile.email}</DropdownMenuItem>
+          <DropdownMenuItem className="font-medium">{userProfile.name || 'Unknown'}</DropdownMenuItem>
+          <DropdownMenuItem>{userProfile.email || 'No email'}</DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
