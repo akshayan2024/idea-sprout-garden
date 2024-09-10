@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AuthForm from '../components/AuthForm';
@@ -7,53 +6,24 @@ import ContentAspirationForm from '../components/ContentAspirationForm';
 import ContentIdeaGenerator from '../components/ContentIdeaGenerator';
 import TreemapVisualization from '../components/TreemapVisualization';
 import ProfileSection from '../components/ProfileSection';
+import { useAuthStore } from '../store/authStore';
+import { useContentStore } from '../store/contentStore';
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
-  const [userDictionary, setUserDictionary] = useState(null);
+  const { isLoggedIn, checkSession } = useAuthStore();
+  const { userDictionary } = useContentStore();
 
   useEffect(() => {
-    const checkUserSession = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/check-session', {
-          credentials: 'include'
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.isAuthenticated) {
-            setIsLoggedIn(true);
-            setUserProfile(data.profile);
-          }
-        }
-      } catch (error) {
-        console.error('Error checking user session:', error);
-      }
-    };
-
-    checkUserSession();
-  }, []);
-
-  const handleLogin = async (userData) => {
-    // This is a placeholder. In a real app, you'd make an API call to log in
-    setIsLoggedIn(true);
-    setUserProfile(userData); // Assume userData contains the profile information
-  };
-
-  const handleContentAspirationSubmit = (data) => {
-    setUserDictionary({
-      ...data.meta_creator,
-      ...data.meta_content
-    });
-  };
+    checkSession();
+  }, [checkSession]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-skyBlue to-brand-goldenYellow p-8">
       <h1 className="text-4xl font-bold mb-8 text-center text-brand-lightGray">Content Idea Sprout Garden</h1>
-      {isLoggedIn && <ProfileSection userProfile={userProfile} />}
+      {isLoggedIn && <ProfileSection />}
       <div className="max-w-3xl mx-auto">
         {!isLoggedIn ? (
-          <AuthForm onLogin={handleLogin} />
+          <AuthForm />
         ) : (
           <Tabs defaultValue="aspiration" className="space-y-4">
             <TabsList className="grid w-full grid-cols-3 bg-brand-lightGray">
@@ -63,12 +33,12 @@ const Index = () => {
             </TabsList>
             <TabsContent value="aspiration">
               <Card className="bg-brand-lightGray border-brand-skyBlue">
-                <ContentAspirationForm onSubmit={handleContentAspirationSubmit} />
+                <ContentAspirationForm />
               </Card>
             </TabsContent>
             <TabsContent value="generator">
               <Card className="bg-brand-lightGray border-brand-skyBlue">
-                <ContentIdeaGenerator userDictionary={userDictionary} />
+                <ContentIdeaGenerator />
               </Card>
             </TabsContent>
             <TabsContent value="visualization">

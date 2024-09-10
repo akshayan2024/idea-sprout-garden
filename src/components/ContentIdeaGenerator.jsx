@@ -2,33 +2,18 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useMutation } from '@tanstack/react-query';
+import { useContentStore } from '../store/contentStore';
 
-const ContentIdeaGenerator = ({ userDictionary }) => {
+const ContentIdeaGenerator = () => {
   const [trendingWord, setTrendingWord] = useState('');
-  const [generatedIdeas, setGeneratedIdeas] = useState([]);
+  const { generateIdeas, generatedIdeas } = useContentStore();
 
-  const generateIdeasMutation = useMutation({
-    mutationFn: (data) => 
-      fetch('http://localhost:5000/generate-ideas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }).then(res => res.json()),
-  });
-
-  const generateIdeas = () => {
+  const handleGenerateIdeas = async () => {
     const data = {
       user_id: 'user123', // Replace with actual user ID
       trendingWord: trendingWord,
     };
-    generateIdeasMutation.mutate(data, {
-      onSuccess: (data) => {
-        setGeneratedIdeas(data.ideas);
-      },
-    });
+    await generateIdeas(data);
   };
 
   return (
@@ -44,13 +29,8 @@ const ContentIdeaGenerator = ({ userDictionary }) => {
             placeholder="Enter a trending word or topic"
           />
         </div>
-        <Button onClick={generateIdeas} disabled={generateIdeasMutation.isPending}>
-          {generateIdeasMutation.isPending ? 'Generating...' : 'Generate Ideas'}
-        </Button>
+        <Button onClick={handleGenerateIdeas}>Generate Ideas</Button>
       </div>
-      {generateIdeasMutation.isError && (
-        <p className="text-red-500 mt-2">Error: {generateIdeasMutation.error.message}</p>
-      )}
       {generatedIdeas.length > 0 && (
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-2">Generated Ideas:</h3>

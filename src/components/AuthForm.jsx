@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useAuthStore } from '../store/authStore';
 
-const AuthForm = ({ onLogin }) => {
+const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const login = useAuthStore((state) => state.login);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically handle the authentication process
-    // For now, we'll just call the onLogin function
-    onLogin();
+    await login(email, password);
   };
 
   return (

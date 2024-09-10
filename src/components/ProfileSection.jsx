@@ -2,15 +2,13 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuthStore } from '../store/authStore';
 
-const ProfileSection = ({ userProfile }) => {
-  const handleLogout = () => {
-    // Implement logout logic here
-    console.log('Logout clicked');
-  };
+const ProfileSection = () => {
+  const { userProfile, logout } = useAuthStore();
 
   if (!userProfile) {
-    return null; // Don't render anything if userProfile is null
+    return null;
   }
 
   return (
@@ -27,7 +25,7 @@ const ProfileSection = ({ userProfile }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuItem className="font-medium">{userProfile.name || 'Unknown'}</DropdownMenuItem>
           <DropdownMenuItem>{userProfile.email || 'No email'}</DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

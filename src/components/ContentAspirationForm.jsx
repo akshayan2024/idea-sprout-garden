@@ -1,69 +1,30 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { useMutation } from '@tanstack/react-query';
+import { useContentStore } from '../store/contentStore';
 import { toast } from 'sonner';
 
-const BACKEND_URL = 'http://localhost:5000';
-
-const ContentAspirationForm = ({ onSubmit }) => {
+const ContentAspirationForm = () => {
   const [tone, setTone] = useState('');
   const [style, setStyle] = useState('');
-  const [creatorFile, setCreatorFile] = useState(null);
-  const [channelFile, setChannelFile] = useState(null);
-
-  const processInputMutation = useMutation({
-    mutationFn: (data) => 
-      fetch(`${BACKEND_URL}/process-input`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }).then(res => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      }),
-    onError: (error) => {
-      console.error('Error processing input:', error);
-      toast.error('Failed to process input. Please try again.');
-    },
-  });
-
-  const handleFileChange = (event, setFile) => {
-    const file = event.target.files[0];
-    if (file) {
-      setFile(file);
-    }
-  };
+  const processContentAspiration = useContentStore((state) => state.processContentAspiration);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!creatorFile || !channelFile) {
-      toast.error('Please upload both creator and channel files.');
-      return;
-    }
-
-    const creatorContent = await creatorFile.text();
-    const channelContent = await channelFile.text();
-
     const data = {
       user_id: 'user123', // Replace with actual user ID
-      creator_text: `${tone} ${style}\n${creatorContent}`,
-      content_text: channelContent,
+      creator_text: `${tone} ${style}`,
+      content_text: 'Sample content text', // Replace with actual content
     };
 
-    processInputMutation.mutate(data, {
-      onSuccess: (data) => {
-        onSubmit(data);
-        toast.success('Content aspirations processed successfully!');
-      },
-    });
+    try {
+      await processContentAspiration(data);
+      toast.success('Content aspirations processed successfully!');
+    } catch (error) {
+      toast.error('Failed to process content aspirations. Please try again.');
+    }
   };
 
   return (
@@ -90,33 +51,8 @@ const ContentAspirationForm = ({ onSubmit }) => {
             required
           />
         </div>
-        <div>
-          <label htmlFor="creatorFile" className="block text-sm font-medium text-gray-700 mb-1">Upload Creator File</label>
-          <Input
-            id="creatorFile"
-            type="file"
-            accept=".txt"
-            onChange={(e) => handleFileChange(e, setCreatorFile)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="channelFile" className="block text-sm font-medium text-gray-700 mb-1">Upload Channel File</label>
-          <Input
-            id="channelFile"
-            type="file"
-            accept=".txt"
-            onChange={(e) => handleFileChange(e, setChannelFile)}
-            required
-          />
-        </div>
-        <Button type="submit" disabled={processInputMutation.isPending}>
-          {processInputMutation.isPending ? 'Submitting...' : 'Submit Aspirations'}
-        </Button>
+        <Button type="submit">Submit Aspirations</Button>
       </form>
-      {processInputMutation.isError && (
-        <p className="text-red-500 mt-2">Error: {processInputMutation.error.message}</p>
-      )}
     </Card>
   );
 };

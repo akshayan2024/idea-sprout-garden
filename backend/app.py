@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for now
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 nltk.download('wordnet')
 
@@ -124,9 +124,28 @@ def check_session():
     # This is a placeholder. In a real application, you'd check the session or token
     # and return the user's profile if they're authenticated.
     return jsonify({
-        "isAuthenticated": False,
-        "profile": None
+        "isAuthenticated": True,
+        "profile": {
+            "name": "John Doe",
+            "email": "john@example.com",
+            "avatarUrl": "https://example.com/avatar.jpg"
+        }
     })
+
+@app.route('/login', methods=['POST'])
+def login():
+    # This is a placeholder. In a real application, you'd validate credentials
+    # and create a session or token.
+    return jsonify({
+        "name": "John Doe",
+        "email": "john@example.com",
+        "avatarUrl": "https://example.com/avatar.jpg"
+    })
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # This is a placeholder. In a real application, you'd invalidate the session or token.
+    return jsonify({"message": "Logged out successfully"})
 
 if __name__ == '__main__':
     app.run(debug=True)
