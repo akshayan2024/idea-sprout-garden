@@ -5,19 +5,28 @@ import { Card } from "@/components/ui/card";
 const CustomizedContent = (props) => {
   const { root, depth, x, y, width, height, index, name, value } = props;
 
+  const leafPath = "M0,0 C0,0 50,100 0,200 C0,200 50,100 100,200 C100,200 50,100 100,0 C100,0 50,100 0,0";
+
+  const gradientId = `gradient-${index}`;
+  const lightGreen = `hsl(120, 70%, ${80 - depth * 20}%)`;
+  const darkGreen = `hsl(120, 70%, ${60 - depth * 20}%)`;
+
   return (
     <g>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        style={{
-          fill: depth < 2 ? '#8884d8' : '#84a9d8',
-          stroke: '#fff',
-          strokeWidth: 2 / (depth + 1e-10),
-          strokeOpacity: 1 / (depth + 1e-10),
-        }}
+      <defs>
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={lightGreen} />
+          <stop offset="100%" stopColor={darkGreen} />
+        </linearGradient>
+      </defs>
+      <path
+        d={leafPath}
+        transform={`translate(${x},${y}) scale(${width / 100}, ${height / 200})`}
+        fill={`url(#${gradientId})`}
+        stroke="#fff"
+        strokeWidth={2 / (depth + 1e-10)}
+        strokeOpacity={1 / (depth + 1e-10)}
+        style={{ cursor: 'pointer' }}
       />
       {depth === 1 && (
         <text
@@ -26,6 +35,7 @@ const CustomizedContent = (props) => {
           textAnchor="middle"
           fill="#fff"
           fontSize={14}
+          style={{ pointerEvents: 'none' }}
         >
           {name}
         </text>
@@ -34,10 +44,27 @@ const CustomizedContent = (props) => {
   );
 };
 
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white p-2 border border-gray-300 rounded shadow">
+        <p>{`${data.name}: ${data.size}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const TreemapVisualization = ({ data }) => {
   const transformedData = {
     name: 'Content Aspirations',
     children: Object.entries(data || {}).map(([name, size]) => ({ name, size })),
+  };
+
+  const handleClick = (data) => {
+    console.log('Clicked leaf:', data);
+    // Add your interaction logic here
   };
 
   return (
@@ -52,6 +79,7 @@ const TreemapVisualization = ({ data }) => {
             stroke="#fff"
             fill="#8884d8"
             content={<CustomizedContent />}
+            onClick={handleClick}
           >
             <Tooltip content={<CustomTooltip />} />
           </Treemap>
@@ -59,18 +87,6 @@ const TreemapVisualization = ({ data }) => {
       </div>
     </Card>
   );
-};
-
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-white p-2 border border-gray-300 rounded shadow">
-        <p>{`${data.name}: ${data.size}`}</p>
-      </div>
-    );
-  }
-  return null;
 };
 
 export default TreemapVisualization;
