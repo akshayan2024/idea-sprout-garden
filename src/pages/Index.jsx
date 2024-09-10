@@ -23,17 +23,11 @@ const Index = () => {
     setHasProfile(true);
   };
 
-  const handleContentAspirationSubmit = (aspirations) => {
-    // In a real application, this would send the aspirations to the backend
-    // and receive a processed dictionary. For now, we'll use a simulated one.
-    const simulatedDictionary = {
-      technology: 10,
-      innovation: 8,
-      AI: 7,
-      sustainability: 6,
-      future: 5
-    };
-    setUserDictionary(simulatedDictionary);
+  const handleContentAspirationSubmit = (data) => {
+    setUserDictionary({
+      ...data.meta_creator,
+      ...data.meta_content
+    });
   };
 
   const handleFileUpload = (content) => {

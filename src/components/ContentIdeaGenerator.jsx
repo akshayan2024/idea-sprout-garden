@@ -2,23 +2,33 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useMutation } from '@tanstack/react-query';
 
 const ContentIdeaGenerator = ({ userDictionary }) => {
   const [trendingWord, setTrendingWord] = useState('');
   const [generatedIdeas, setGeneratedIdeas] = useState([]);
 
+  const generateIdeasMutation = useMutation({
+    mutationFn: (data) => 
+      fetch('http://localhost:5000/generate-ideas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }).then(res => res.json()),
+  });
+
   const generateIdeas = () => {
-    // In a real application, this would make an API call to your backend
-    // which would then use GPT-4 to generate ideas based on the user's dictionary and trending word
-    // For now, we'll simulate this process with some placeholder ideas
-    const simulatedIdeas = [
-      `How ${trendingWord} is Revolutionizing the Tech Industry`,
-      `The Future of ${trendingWord}: A Sustainable Approach`,
-      `10 Innovative Ways to Use ${trendingWord} in Your Daily Life`,
-      `The Ethical Implications of ${trendingWord} in Modern Society`,
-      `${trendingWord}: A Comprehensive Guide for Beginners`
-    ];
-    setGeneratedIdeas(simulatedIdeas);
+    const data = {
+      user_id: 'user123', // Replace with actual user ID
+      trendingWord: trendingWord,
+    };
+    generateIdeasMutation.mutate(data, {
+      onSuccess: (data) => {
+        setGeneratedIdeas(data.ideas);
+      },
+    });
   };
 
   return (
@@ -34,8 +44,13 @@ const ContentIdeaGenerator = ({ userDictionary }) => {
             placeholder="Enter a trending word or topic"
           />
         </div>
-        <Button onClick={generateIdeas}>Generate Ideas</Button>
+        <Button onClick={generateIdeas} disabled={generateIdeasMutation.isPending}>
+          {generateIdeasMutation.isPending ? 'Generating...' : 'Generate Ideas'}
+        </Button>
       </div>
+      {generateIdeasMutation.isError && (
+        <p className="text-red-500 mt-2">Error: {generateIdeasMutation.error.message}</p>
+      )}
       {generatedIdeas.length > 0 && (
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-2">Generated Ideas:</h3>

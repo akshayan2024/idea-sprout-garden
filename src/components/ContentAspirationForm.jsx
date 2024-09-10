@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
   const [tone, setTone] = useState('');
@@ -15,9 +16,29 @@ const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
     }
   }, [uploadedContent]);
 
+  const processInputMutation = useMutation({
+    mutationFn: (data) => 
+      fetch('http://localhost:5000/process-input', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }).then(res => res.json()),
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ tone, style, interests });
+    const data = {
+      user_id: 'user123', // Replace with actual user ID
+      creator_text: `${tone} ${style}`,
+      content_text: interests,
+    };
+    processInputMutation.mutate(data, {
+      onSuccess: (data) => {
+        onSubmit(data);
+      },
+    });
   };
 
   return (
@@ -54,8 +75,13 @@ const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
             required
           />
         </div>
-        <Button type="submit">Submit Aspirations</Button>
+        <Button type="submit" disabled={processInputMutation.isPending}>
+          {processInputMutation.isPending ? 'Submitting...' : 'Submit Aspirations'}
+        </Button>
       </form>
+      {processInputMutation.isError && (
+        <p className="text-red-500 mt-2">Error: {processInputMutation.error.message}</p>
+      )}
     </Card>
   );
 };
