@@ -7,6 +7,10 @@ from sqlalchemy.orm import sessionmaker
 import nltk
 from nltk.corpus import wordnet
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -14,11 +18,11 @@ CORS(app)
 # Download required NLTK data
 nltk.download('wordnet')
 
-# Configure OpenAI API (you'll need to set up your API key)
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+# Configure OpenAI API
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Configure PostgreSQL
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://username:password@localhost/dbname')
+DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
