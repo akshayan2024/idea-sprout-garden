@@ -51,10 +51,10 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        leaf: {
-          light: "hsl(120, 70%, 80%)",
-          DEFAULT: "hsl(120, 70%, 60%)",
-          dark: "hsl(120, 70%, 40%)",
+        brand: {
+          skyBlue: "#87ceeb",
+          goldenYellow: "#f8c100",
+          lightGray: "#e3e3e3",
         },
       },
       borderRadius: {
