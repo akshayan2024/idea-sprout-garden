@@ -4,6 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+const BACKEND_URL = 'http://localhost:5000'; // Update this if your backend is running on a different port
 
 const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
   const [tone, setTone] = useState('');
@@ -18,13 +21,22 @@ const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
 
   const processInputMutation = useMutation({
     mutationFn: (data) => 
-      fetch('http://localhost:5000/process-input', {
+      fetch(`${BACKEND_URL}/process-input`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-      }).then(res => res.json()),
+      }).then(res => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      }),
+    onError: (error) => {
+      console.error('Error processing input:', error);
+      toast.error('Failed to process input. Please try again.');
+    },
   });
 
   const handleSubmit = (e) => {
@@ -37,6 +49,7 @@ const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
     processInputMutation.mutate(data, {
       onSuccess: (data) => {
         onSubmit(data);
+        toast.success('Content aspirations processed successfully!');
       },
     });
   };
