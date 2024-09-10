@@ -24,6 +24,8 @@ const Index = () => {
   };
 
   const handleContentAspirationSubmit = (aspirations) => {
+    // In a real application, this would send the aspirations to the backend
+    // and receive a processed dictionary. For now, we'll use a simulated one.
     const simulatedDictionary = {
       technology: 10,
       innovation: 8,
