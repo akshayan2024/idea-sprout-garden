@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 
-const ContentAspirationForm = ({ onSubmit }) => {
+const ContentAspirationForm = ({ onSubmit, uploadedContent }) => {
   const [tone, setTone] = useState('');
   const [style, setStyle] = useState('');
   const [interests, setInterests] = useState('');
+
+  useEffect(() => {
+    if (uploadedContent) {
+      setInterests(uploadedContent);
+    }
+  }, [uploadedContent]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
