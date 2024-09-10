@@ -1,38 +1,68 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AuthForm from '../components/AuthForm';
+import ProfileForm from '../components/ProfileForm';
+import ContentAspirationForm from '../components/ContentAspirationForm';
 import ContentIdeaGenerator from '../components/ContentIdeaGenerator';
+import TreemapVisualization from '../components/TreemapVisualization';
 
 const Index = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
+  const [userDictionary, setUserDictionary] = useState(null);
+
+  const handleLogin = () => {
+    // Implement actual login logic here
+    setIsLoggedIn(true);
+  };
+
+  const handleProfileCreation = () => {
+    // Implement actual profile creation logic here
+    setHasProfile(true);
+  };
+
+  const handleContentAspirationSubmit = (aspirations) => {
+    // Here you would typically send the aspirations to your backend
+    // and receive the processed dictionary. For now, we'll simulate this:
+    const simulatedDictionary = {
+      technology: 10,
+      innovation: 8,
+      AI: 7,
+      sustainability: 6,
+      future: 5
+    };
+    setUserDictionary(simulatedDictionary);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-4xl font-bold mb-8 text-center">Content Idea Generator</h1>
       <div className="max-w-3xl mx-auto">
-        <Card className="p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Your Brand Insights</h2>
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="brandName" className="block text-sm font-medium text-gray-700 mb-1">Brand/Channel Name</label>
-              <Input id="brandName" placeholder="Enter your brand or channel name" />
-            </div>
-            <div>
-              <label htmlFor="niche" className="block text-sm font-medium text-gray-700 mb-1">Niche/Industry</label>
-              <Input id="niche" placeholder="e.g., Technology, Fashion, Fitness" />
-            </div>
-            <div>
-              <label htmlFor="targetAudience" className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
-              <Input id="targetAudience" placeholder="Describe your target audience" />
-            </div>
-            <div>
-              <label htmlFor="brandValues" className="block text-sm font-medium text-gray-700 mb-1">Brand Values</label>
-              <Textarea id="brandValues" placeholder="What does your brand stand for?" />
-            </div>
-            <Button type="submit">Generate Ideas</Button>
-          </form>
-        </Card>
-        <ContentIdeaGenerator />
+        {!isLoggedIn ? (
+          <AuthForm onLogin={handleLogin} />
+        ) : !hasProfile ? (
+          <ProfileForm onProfileCreation={handleProfileCreation} />
+        ) : (
+          <Tabs defaultValue="aspiration">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="aspiration">Content Aspiration</TabsTrigger>
+              <TabsTrigger value="generator">Idea Generator</TabsTrigger>
+              <TabsTrigger value="visualization">Visualization</TabsTrigger>
+            </TabsList>
+            <TabsContent value="aspiration">
+              <ContentAspirationForm onSubmit={handleContentAspirationSubmit} />
+            </TabsContent>
+            <TabsContent value="generator">
+              <ContentIdeaGenerator userDictionary={userDictionary} />
+            </TabsContent>
+            <TabsContent value="visualization">
+              <TreemapVisualization data={userDictionary} />
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   );
