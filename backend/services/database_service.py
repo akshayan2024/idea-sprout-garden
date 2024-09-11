@@ -29,16 +29,24 @@ class DatabaseService:
         db_name = os.getenv('DB_NAME')
 
         if not all([db_user, db_password, db_host, db_name]):
-            raise ValueError("Database configuration is incomplete. Please check your .env file.")
+            missing = [var for var in ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_NAME'] if not os.getenv(var)]
+            raise ValueError(f"Missing environment variables: {', '.join(missing)}. Please check your .env file.")
 
         DATABASE_URL = f"postgresql://{db_user}:{db_password}@{db_host}/{db_name}"
-        self.engine = create_engine(DATABASE_URL)
-        self.Session = sessionmaker(bind=self.engine)
+        print(f"Attempting to connect to database: {db_host}/{db_name}")
         
         try:
+            self.engine = create_engine(DATABASE_URL)
+            self.Session = sessionmaker(bind=self.engine)
+            
+            # Test the connection
+            with self.engine.connect() as connection:
+                print("Successfully connected to the database.")
+            
             Base.metadata.create_all(self.engine)
+            print("Database tables created successfully.")
         except Exception as e:
-            print(f"Error creating database tables: {e}")
+            print(f"Error connecting to the database: {str(e)}")
             raise
 
     def create_user(self, email, hashed_password):
