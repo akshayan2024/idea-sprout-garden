@@ -62,8 +62,27 @@ def logout():
 @app.route('/process-input', methods=['POST'])
 def process_input():
     data = request.json
-    processed_data = content_service.process_content_aspiration(data['creator_text'], data['content_text'])
-    return jsonify(processed_data)
+    user_id = data.get('user_id')
+    creator_text = data.get('creator_text')
+    content_text = data.get('content_text')
+    
+    # Process the input and generate metadata
+    processed_data = content_service.process_content_aspiration(creator_text, content_text)
+    
+    # Store the metadata in the user_metadata table
+    db_service.upsert_user_metadata(user_id, 'meta_creator', processed_data['meta_creator'])
+    db_service.upsert_user_metadata(user_id, 'meta_content', processed_data['meta_content'])
+    
+    # Generate and store an initial idea
+    initial_idea = content_service.generate_idea(processed_data['processed_keywords'])
+    db_service.store_generated_idea(user_id, processed_data['processed_keywords'], initial_idea)
+    
+    return jsonify({
+        'status': 'success',
+        'message': 'Content aspirations processed and stored successfully',
+        'processed_data': processed_data,
+        'initial_idea': initial_idea
+    })
 
 if __name__ == '__main__':
     app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
