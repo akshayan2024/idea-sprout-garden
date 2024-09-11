@@ -2,6 +2,9 @@ from sqlalchemy import create_engine, Column, Integer, String, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 Base = declarative_base()
 
@@ -20,10 +23,23 @@ class UserMetadata(Base):
 
 class DatabaseService:
     def __init__(self):
-        DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+        db_user = os.getenv('DB_USER')
+        db_password = os.getenv('DB_PASSWORD')
+        db_host = os.getenv('DB_HOST')
+        db_name = os.getenv('DB_NAME')
+
+        if not all([db_user, db_password, db_host, db_name]):
+            raise ValueError("Database configuration is incomplete. Please check your .env file.")
+
+        DATABASE_URL = f"postgresql://{db_user}:{db_password}@{db_host}/{db_name}"
         self.engine = create_engine(DATABASE_URL)
         self.Session = sessionmaker(bind=self.engine)
-        Base.metadata.create_all(self.engine)
+        
+        try:
+            Base.metadata.create_all(self.engine)
+        except Exception as e:
+            print(f"Error creating database tables: {e}")
+            raise
 
     def create_user(self, email, hashed_password):
         session = self.Session()
