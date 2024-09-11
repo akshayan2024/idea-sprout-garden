@@ -1,16 +1,12 @@
 import openai
 import os
-import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from collections import Counter
 
 class ContentService:
-    def __init__(self, db_service):
-        self.db_service = db_service
+    def __init__(self):
         openai.api_key = os.getenv('OPENAI_API_KEY')
-        nltk.download('punkt')
-        nltk.download('stopwords')
 
     def generate_idea(self, input_text):
         response = openai.ChatCompletion.create(
@@ -23,14 +19,21 @@ class ContentService:
         )
         return response.choices[0].message['content'].strip()
 
-    def store_generated_idea(self, user_id, input_text, generated_text):
-        self.db_service.store_generated_idea(user_id, input_text, generated_text)
-
-    def store_raw_text(self, user_id, creator_text, content_text):
-        self.db_service.upsert_user_metadata(user_id, creator_text, content_text)
-
-    def get_user_ideas(self, user_id):
-        return self.db_service.get_user_generated_ideas(user_id)
+    def process_content_aspiration(self, creator_text, content_text):
+        # Process creator text
+        creator_keywords = self._extract_keywords(creator_text)
+        
+        # Process content text
+        content_keywords = self._extract_keywords(content_text)
+        
+        return {
+            "creator": {
+                "keywords": creator_keywords
+            },
+            "content": {
+                "keywords": content_keywords
+            }
+        }
 
     def _extract_keywords(self, text):
         tokens = word_tokenize(text.lower())
