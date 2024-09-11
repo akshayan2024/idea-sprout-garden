@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useContentStore } from '../store/contentStore';
+import { useAuthStore } from '../store/authStore';
 import { toast } from 'sonner';
 import FileUploader from './FileUploader';
 
@@ -11,6 +12,7 @@ const ContentAspirationForm = () => {
   const [creatorFileName, setCreatorFileName] = useState('');
   const [contentFileName, setContentFileName] = useState('');
   const { processContentAspiration, setHasUploadedFiles } = useContentStore();
+  const { userProfile } = useAuthStore();
 
   const handleCreatorFileUpload = (content, fileName) => {
     setCreatorText(content);
@@ -31,6 +33,7 @@ const ContentAspirationForm = () => {
     }
 
     const data = {
+      user_id: userProfile.id,
       creator_text: creatorText,
       content_text: contentText,
     };
