@@ -13,6 +13,21 @@ class DatabaseService:
         )
         self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
 
+    def get_user_by_google_id(self, google_id):
+        query = "SELECT * FROM users WHERE google_id = %s;"
+        self.cursor.execute(query, (google_id,))
+        return self.cursor.fetchone()
+
+    def create_user(self, google_id, email, name):
+        query = """
+        INSERT INTO users (google_id, email, name)
+        VALUES (%s, %s, %s)
+        RETURNING *;
+        """
+        self.cursor.execute(query, (google_id, email, name))
+        self.conn.commit()
+        return self.cursor.fetchone()
+
     def store_user_metadata(self, user_id, meta_creator, meta_content):
         query = """
         INSERT INTO user_metadata (user_id, meta_creator, meta_content)

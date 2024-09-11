@@ -3,13 +3,13 @@ import { authService } from '../services/authService';
 import { logger } from '../utils/logger';
 
 export const useAuthStore = create((set) => ({
-  isLoggedIn: true,
-  userProfile: { id: 'temp-user-id', email: 'dummy@example.com', name: 'Dummy User' },
-  login: async (email, password) => {
+  isLoggedIn: false,
+  userProfile: null,
+  login: async (credentialResponse) => {
     try {
-      logger.info('Attempting login', { email });
-      const userData = await authService.login(email, password);
-      set({ userProfile: userData });
+      logger.info('Attempting login with Google');
+      const userData = await authService.loginWithGoogle(credentialResponse);
+      set({ userProfile: userData, isLoggedIn: true });
       logger.info('Login successful', { userId: userData.id });
     } catch (error) {
       logger.error('Login failed', { error: error.message });

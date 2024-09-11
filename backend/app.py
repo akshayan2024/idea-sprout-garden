@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 # Load environment variables
 load_dotenv()
@@ -33,25 +35,33 @@ db_service = DatabaseService()
 auth_service = AuthService(db_service)
 content_service = ContentService(db_service)
 
-@app.route('/register', methods=['POST'])
-def register():
-    data = request.json
-    app.logger.info(f"Attempting to register user: {data['email']}")
-    user_id = auth_service.register(data['email'], data['password'])
-    app.logger.info(f"User registered successfully: {user_id}")
-    return jsonify({'status': 'success', 'user_id': user_id})
+@app.route('/auth/google', methods=['POST'])
+def google_auth():
+    token = request.json['credential']
+    try:
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), os.getenv('GOOGLE_CLIENT_ID'))
+        userid = idinfo['sub']
+        email = idinfo['email']
+        name = idinfo.get('name', '')
+        
+        # Here you would typically check if the user exists in your database
+        # If not, create a new user entry
+        user = auth_service.get_or_create_user(userid, email, name)
+        
+        return jsonify(user)
+    except ValueError:
+        return jsonify({'error': 'Invalid token'}), 401
 
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    app.logger.info(f"Attempting login for user: {data['email']}")
-    session_token = auth_service.login(data['email'], data['password'])
-    if session_token:
-        app.logger.info(f"Login successful for user: {data['email']}")
-        return jsonify({'status': 'success', 'session_token': session_token})
-    else:
-        app.logger.warning(f"Login failed for user: {data['email']}")
-        return jsonify({'status': 'error', 'message': 'Invalid credentials'})
+@app.route('/auth/logout', methods=['POST'])
+def logout():
+    # Implement logout logic here
+    return jsonify({'status': 'success'})
+
+@app.route('/auth/session', methods=['GET'])
+def check_session():
+    # Implement session check logic here
+    # This is a placeholder implementation
+    return jsonify({'isAuthenticated': True, 'profile': {'id': 'placeholder', 'email': 'placeholder@example.com'}})
 
 @app.route('/upload-aspiration', methods=['POST'])
 def upload_aspiration():

@@ -1,26 +1,31 @@
-// This file will be replaced with a third-party authentication service in the future
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000';
 
 export const authService = {
-  login: async (email, password) => {
-    // TODO: Implement third-party authentication service
-    console.log('Login functionality will be implemented with a third-party service');
-    return { id: 'dummy-user-id', email: email, name: 'Dummy User' };
-  },
-
-  register: async (email, password) => {
-    // TODO: Implement third-party authentication service
-    console.log('Registration functionality will be implemented with a third-party service');
-    return { id: 'dummy-user-id', email: email, name: 'Dummy User', isNewUser: true };
+  loginWithGoogle: async (credentialResponse) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/google`, { credential: credentialResponse.credential });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
   logout: async () => {
-    // TODO: Implement third-party authentication service
-    console.log('Logout functionality will be implemented with a third-party service');
+    try {
+      await axios.post(`${API_URL}/auth/logout`);
+    } catch (error) {
+      throw error;
+    }
   },
 
   checkSession: async () => {
-    // TODO: Implement third-party authentication service
-    console.log('Session check will be implemented with a third-party service');
-    return { isAuthenticated: true, profile: { id: 'dummy-user-id', email: 'dummy@example.com', name: 'Dummy User' } };
+    try {
+      const response = await axios.get(`${API_URL}/auth/session`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

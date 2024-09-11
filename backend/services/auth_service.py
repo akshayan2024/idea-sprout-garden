@@ -6,23 +6,16 @@ class AuthService:
     def __init__(self, db_service):
         self.db_service = db_service
 
-    def register(self, email, password):
-        password_hash = generate_password_hash(password)
-        return self.db_service.create_user(email, password_hash)
+    def get_or_create_user(self, google_id, email, name):
+        user = self.db_service.get_user_by_google_id(google_id)
+        if not user:
+            user = self.db_service.create_user(google_id, email, name)
+        return user
 
-    def login(self, email, password):
-        user = self.db_service.get_user_by_email(email)
-        if user and check_password_hash(user['password_hash'], password):
-            session_token = str(uuid.uuid4())
-            expires_at = datetime.now() + timedelta(days=1)  # 1-day session expiration
-            self.db_service.create_session(user['id'], session_token, expires_at)
-            return session_token
-        else:
-            return None
+    def logout(self):
+        # Implement logout logic if needed
+        pass
 
     def validate_session(self, session_token):
         session = self.db_service.get_session(session_token)
         return session is not None
-
-    def logout(self, session_token):
-        self.db_service.delete_session(session_token)
