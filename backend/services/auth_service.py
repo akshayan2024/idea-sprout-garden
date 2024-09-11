@@ -1,47 +1,28 @@
-from flask import jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
+from datetime import datetime, timedelta
 
 class AuthService:
     def __init__(self, db_service):
         self.db_service = db_service
 
-    def register(self, data):
-        email = data.get('email')
-        password = data.get('password')
-        
-        if not email or not password:
-            return jsonify({"error": "Email and password are required"}), 400
-        
-        if self.db_service.get_user_by_email(email):
-            return jsonify({"error": "User already exists"}), 409
-        
-        hashed_password = generate_password_hash(password)
-        user_id = self.db_service.create_user(email, hashed_password)
-        
-        return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
+    def register(self, email, password):
+        password_hash = generate_password_hash(password)
+        return self.db_service.create_user(email, password_hash)
 
-    def login(self, data):
-        email = data.get('email')
-        password = data.get('password')
-        
-        if not email or not password:
-            return jsonify({"error": "Email and password are required"}), 400
-        
+    def login(self, email, password):
         user = self.db_service.get_user_by_email(email)
-        if not user or not check_password_hash(user['password'], password):
-            return jsonify({"error": "Invalid email or password"}), 401
-        
-        # Here you would typically create a session or JWT token
-        # For simplicity, we'll just return the user ID
-        return jsonify({"message": "Login successful", "user_id": user['id']}), 200
+        if user and check_password_hash(user['password_hash'], password):
+            session_token = str(uuid.uuid4())
+            expires_at = datetime.now() + timedelta(days=1)  # 1-day session expiration
+            self.db_service.create_session(user['id'], session_token, expires_at)
+            return session_token
+        else:
+            return None
 
-    def check_session(self):
-        # This is a placeholder. In a real app, you'd verify the session or JWT token
-        return jsonify({
-            "isAuthenticated": False,
-            "profile": None
-        })
+    def validate_session(self, session_token):
+        session = self.db_service.get_session(session_token)
+        return session is not None
 
-    def logout(self):
-        # This is a placeholder. In a real app, you'd invalidate the session or JWT token
-        return jsonify({"message": "Logout successful"}), 200
+    def logout(self, session_token):
+        self.db_service.delete_session(session_token)

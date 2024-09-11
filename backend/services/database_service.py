@@ -1,91 +1,82 @@
-from sqlalchemy import create_engine, Column, Integer, String, JSON
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-Base = declarative_base()
-
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-
-class UserMetadata(Base):
-    __tablename__ = 'user_metadata'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, unique=True)
-    meta_creator = Column(JSON)
-    meta_content = Column(JSON)
 
 class DatabaseService:
     def __init__(self):
-        db_user = os.getenv('DB_USER')
-        db_password = os.getenv('DB_PASSWORD')
-        db_host = os.getenv('DB_HOST')
-        db_name = os.getenv('DB_NAME')
+        self.conn = psycopg2.connect(
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
+        )
+        self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
 
-        if not all([db_user, db_password, db_host, db_name]):
-            missing = [var for var in ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_NAME'] if not os.getenv(var)]
-            raise ValueError(f"Missing environment variables: {', '.join(missing)}. Please check your .env file.")
+    # Create a new user
+    def create_user(self, email, password_hash):
+        query = """
+        INSERT INTO users (email, password_hash) 
+        VALUES (%s, %s) RETURNING id;
+        """
+        self.cursor.execute(query, (email, password_hash))
+        self.conn.commit()
+        return self.cursor.fetchone()['id']
 
-        DATABASE_URL = f"postgresql://{db_user}:{db_password}@{db_host}/{db_name}"
-        print(f"Attempting to connect to database: {db_host}/{db_name}")
-        
-        try:
-            self.engine = create_engine(DATABASE_URL)
-            self.Session = sessionmaker(bind=self.engine)
-            
-            # Test the connection
-            with self.engine.connect() as connection:
-                print("Successfully connected to the database.")
-            
-            Base.metadata.create_all(self.engine)
-            print("Database tables created successfully.")
-        except Exception as e:
-            print(f"Error connecting to the database: {str(e)}")
-            raise
-
-    def create_user(self, email, hashed_password):
-        session = self.Session()
-        new_user = User(email=email, password=hashed_password)
-        session.add(new_user)
-        session.commit()
-        user_id = new_user.id
-        session.close()
-        return user_id
-
+    # Retrieve a user by email
     def get_user_by_email(self, email):
-        session = self.Session()
-        user = session.query(User).filter_by(email=email).first()
-        session.close()
-        return user.__dict__ if user else None
+        query = "SELECT * FROM users WHERE email = %s;"
+        self.cursor.execute(query, (email,))
+        return self.cursor.fetchone()
 
-    def update_user_metadata(self, user_id, meta_creator, meta_content):
-        session = self.Session()
-        user_metadata = session.query(UserMetadata).filter_by(user_id=user_id).first()
-        
-        if user_metadata:
-            user_metadata.meta_creator = meta_creator
-            user_metadata.meta_content = meta_content
-        else:
-            new_metadata = UserMetadata(user_id=user_id, meta_creator=meta_creator, meta_content=meta_content)
-            session.add(new_metadata)
-        
-        session.commit()
-        session.close()
+    # Create a session
+    def create_session(self, user_id, session_token, expires_at):
+        query = """
+        INSERT INTO sessions (user_id, session_token, expires_at)
+        VALUES (%s, %s, %s);
+        """
+        self.cursor.execute(query, (user_id, session_token, expires_at))
+        self.conn.commit()
 
-    def get_user_metadata(self, user_id):
-        session = self.Session()
-        user_metadata = session.query(UserMetadata).filter_by(user_id=user_id).first()
-        session.close()
-        
-        if user_metadata:
-            return {
-                "meta_creator": user_metadata.meta_creator,
-                "meta_content": user_metadata.meta_content
-            }
-        return None
+    # Validate session by token
+    def get_session(self, session_token):
+        query = "SELECT * FROM sessions WHERE session_token = %s AND expires_at > NOW();"
+        self.cursor.execute(query, (session_token,))
+        return self.cursor.fetchone()
+
+    # Delete session (logout)
+    def delete_session(self, session_token):
+        query = "DELETE FROM sessions WHERE session_token = %s;"
+        self.cursor.execute(query, (session_token,))
+        self.conn.commit()
+
+    # Store a generated idea
+    def store_generated_idea(self, user_id, input_text, generated_text):
+        query = """
+        INSERT INTO generated_ideas (user_id, input_text, generated_text)
+        VALUES (%s, %s, %s);
+        """
+        self.cursor.execute(query, (user_id, input_text, generated_text))
+        self.conn.commit()
+
+    # Retrieve user-generated ideas
+    def get_user_generated_ideas(self, user_id):
+        query = "SELECT input_text, generated_text FROM generated_ideas WHERE user_id = %s;"
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchall()
+
+    # Add or update user metadata
+    def upsert_user_metadata(self, user_id, meta_key, meta_value):
+        query = """
+        INSERT INTO user_metadata (user_id, meta_key, meta_value)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (user_id, meta_key) 
+        DO UPDATE SET meta_value = EXCLUDED.meta_value;
+        """
+        self.cursor.execute(query, (user_id, meta_key, meta_value))
+        self.conn.commit()
+
+    # Retrieve user metadata
+    def get_user_metadata(self, user_id, meta_key):
+        query = "SELECT meta_value FROM user_metadata WHERE user_id = %s AND meta_key = %s;"
+        self.cursor.execute(query, (user_id, meta_key))
+        return self.cursor.fetchone()
