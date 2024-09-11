@@ -8,6 +8,10 @@ export const authService = {
       const response = await axios.post(`${API_URL}/login`, { email, password }, { withCredentials: true });
       return response.data;
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // User not found, attempt registration
+        return authService.register(email, password);
+      }
       console.error('Login error:', error.response?.data || error.message);
       throw error;
     }
@@ -16,7 +20,7 @@ export const authService = {
   register: async (email, password) => {
     try {
       const response = await axios.post(`${API_URL}/register`, { email, password }, { withCredentials: true });
-      return response.data;
+      return { ...response.data, isNewUser: true };
     } catch (error) {
       console.error('Registration error:', error.response?.data || error.message);
       throw error;

@@ -9,17 +9,21 @@ const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const login = useAuthStore((state) => state.login);
+  const { login, register } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(email, password);
-      toast.success('Logged in successfully!');
+      const result = await login(email, password);
+      if (result.isNewUser) {
+        toast.success('Signed up and logged in successfully!');
+      } else {
+        toast.success('Logged in successfully!');
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Login failed. Please try again.');
+      console.error('Auth error:', error);
+      toast.error('Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
