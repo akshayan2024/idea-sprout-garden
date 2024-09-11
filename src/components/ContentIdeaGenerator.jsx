@@ -10,7 +10,6 @@ const ContentIdeaGenerator = () => {
 
   const handleGenerateIdeas = async () => {
     const data = {
-      user_id: 'user123', // Replace with actual user ID
       trendingWord: trendingWord,
     };
     await generateIdeas(data);

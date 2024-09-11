@@ -14,9 +14,8 @@ const ContentAspirationForm = () => {
     e.preventDefault();
     
     const data = {
-      user_id: 'user123', // Replace with actual user ID
       creator_text: `${tone} ${style}`,
-      content_text: 'Sample content text', // Replace with actual content
+      content_text: '', // This will be filled with actual content later
     };
 
     try {
