@@ -11,16 +11,26 @@ export const useContentStore = create((set) => ({
   processedKeywords: null,
   processContentAspiration: async (data) => {
     try {
-      logger.info('Processing content aspiration', { userId: data.user_id });
-      const result = await contentService.processContentAspiration(data);
+      logger.info('Uploading content aspiration', { userId: data.user_id });
+      const result = await contentService.uploadContentAspiration(data);
       set({ 
         metaCreator: result.meta_creator,
         metaContent: result.meta_content,
-        processedKeywords: result.processed_keywords
       });
-      logger.info('Content aspiration processed successfully', { userId: data.user_id });
+      logger.info('Content aspiration uploaded successfully', { userId: data.user_id });
     } catch (error) {
-      logger.error('Content aspiration processing failed', { error: error.message, userId: data.user_id });
+      logger.error('Content aspiration upload failed', { error: error.message, userId: data.user_id });
+      throw error;
+    }
+  },
+  processUploadedData: async (userId) => {
+    try {
+      logger.info('Processing uploaded data', { userId });
+      const result = await contentService.processUploadedData(userId);
+      set({ processedKeywords: result.processed_keywords });
+      logger.info('Uploaded data processed successfully', { userId });
+    } catch (error) {
+      logger.error('Processing uploaded data failed', { error: error.message, userId });
       throw error;
     }
   },

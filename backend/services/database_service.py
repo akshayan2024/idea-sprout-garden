@@ -45,6 +45,31 @@ class DatabaseService:
         self.cursor.execute(query, (session_token,))
         self.conn.commit()
 
+    def store_user_metadata(self, user_id, meta_creator, meta_content):
+        query = """
+        INSERT INTO user_metadata (user_id, meta_creator, meta_content)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (user_id) 
+        DO UPDATE SET meta_creator = %s, meta_content = %s;
+        """
+        self.cursor.execute(query, (user_id, meta_creator, meta_content, meta_creator, meta_content))
+        self.conn.commit()
+        return {"status": "success"}
+
+    def get_user_metadata(self, user_id):
+        query = "SELECT meta_creator, meta_content FROM user_metadata WHERE user_id = %s;"
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchone()
+
+    def update_user_metadata(self, user_id, processed_data):
+        query = """
+        UPDATE user_metadata
+        SET processed_meta = %s
+        WHERE user_id = %s;
+        """
+        self.cursor.execute(query, (json.dumps(processed_data), user_id))
+        self.conn.commit()
+
     def store_generated_idea(self, user_id, input_text, generated_text):
         query = """
         INSERT INTO generated_ideas (user_id, input_text, generated_text)
@@ -57,18 +82,3 @@ class DatabaseService:
         query = "SELECT input_text, generated_text FROM generated_ideas WHERE user_id = %s;"
         self.cursor.execute(query, (user_id,))
         return self.cursor.fetchall()
-
-    def upsert_user_metadata(self, user_id, meta_creator, meta_content):
-        query = """
-        INSERT INTO user_metadata (user_id, meta_creator, meta_content)
-        VALUES (%s, %s, %s)
-        ON CONFLICT (user_id) 
-        DO UPDATE SET meta_creator = %s, meta_content = %s;
-        """
-        self.cursor.execute(query, (user_id, meta_creator, meta_content, meta_creator, meta_content))
-        self.conn.commit()
-
-    def get_user_metadata(self, user_id):
-        query = "SELECT meta_creator, meta_content FROM user_metadata WHERE user_id = %s;"
-        self.cursor.execute(query, (user_id,))
-        return self.cursor.fetchone()

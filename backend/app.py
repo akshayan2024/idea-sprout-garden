@@ -53,6 +53,22 @@ def login():
         app.logger.warning(f"Login failed for user: {data['email']}")
         return jsonify({'status': 'error', 'message': 'Invalid credentials'})
 
+@app.route('/upload-aspiration', methods=['POST'])
+def upload_aspiration():
+    data = request.json
+    app.logger.info(f"Uploading aspiration for user: {data['user_id']}")
+    result = content_service.store_raw_text(data['user_id'], data['creator_text'], data['content_text'])
+    app.logger.info(f"Aspiration uploaded for user: {data['user_id']}")
+    return jsonify(result)
+
+@app.route('/process-aspiration', methods=['POST'])
+def process_aspiration():
+    data = request.json
+    app.logger.info(f"Processing aspiration for user: {data['user_id']}")
+    result = content_service.process_content_aspiration(data['user_id'])
+    app.logger.info(f"Aspiration processed for user: {data['user_id']}")
+    return jsonify(result)
+
 @app.route('/generate-ideas', methods=['POST'])
 def generate_ideas():
     data = request.json
@@ -80,26 +96,6 @@ def logout():
     auth_service.logout(data['session_token'])
     app.logger.info(f"User logged out successfully: {data['session_token']}")
     return jsonify({'status': 'logged out'})
-
-@app.route('/process-input', methods=['POST'])
-def process_input():
-    data = request.json
-    user_id = data.get('user_id')
-    creator_text = data.get('creator_text')
-    content_text = data.get('content_text')
-    
-    app.logger.info(f"Processing content aspiration for user: {user_id}")
-    
-    content_service.store_raw_text(user_id, creator_text, content_text)
-    processed_data = content_service.process_content_aspiration(creator_text, content_text)
-    
-    app.logger.info(f"Content aspiration processed for user: {user_id}")
-    
-    return jsonify({
-        'status': 'success',
-        'message': 'Content aspirations processed successfully',
-        'processed_data': processed_data
-    })
 
 @app.route('/user-ideas/<user_id>', methods=['GET'])
 def get_user_ideas(user_id):

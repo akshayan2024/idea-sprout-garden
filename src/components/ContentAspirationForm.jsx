@@ -11,8 +11,9 @@ const ContentAspirationForm = () => {
   const [contentText, setContentText] = useState('');
   const [creatorFileName, setCreatorFileName] = useState('');
   const [contentFileName, setContentFileName] = useState('');
-  const { processContentAspiration, setHasUploadedFiles } = useContentStore();
+  const { processContentAspiration, setHasUploadedFiles, processUploadedData } = useContentStore();
   const { userProfile } = useAuthStore();
+  const [isUploaded, setIsUploaded] = useState(false);
 
   const handleCreatorFileUpload = (content, fileName) => {
     setCreatorText(content);
@@ -41,6 +42,16 @@ const ContentAspirationForm = () => {
     try {
       await processContentAspiration(data);
       setHasUploadedFiles(true);
+      setIsUploaded(true);
+      toast.success('Content aspirations uploaded successfully!');
+    } catch (error) {
+      toast.error('Failed to upload content aspirations. Please try again.');
+    }
+  };
+
+  const handleProcess = async () => {
+    try {
+      await processUploadedData(userProfile.id);
       toast.success('Content aspirations processed successfully!');
     } catch (error) {
       toast.error('Failed to process content aspirations. Please try again.');
@@ -54,6 +65,9 @@ const ContentAspirationForm = () => {
         <FileUploader onFileUpload={handleCreatorFileUpload} label="Upload file about yourself" />
         <FileUploader onFileUpload={handleContentFileUpload} label="Upload file about your content aspirations" />
         <Button type="submit" className="bg-brand-accent hover:bg-brand-accent/80 text-white">Submit Aspirations</Button>
+        {isUploaded && (
+          <Button onClick={handleProcess} className="bg-brand-accent hover:bg-brand-accent/80 text-white ml-4">Process Aspirations</Button>
+        )}
       </form>
     </Card>
   );
