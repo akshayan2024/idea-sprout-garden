@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => (
-  <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
