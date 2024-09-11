@@ -1,6 +1,7 @@
 import React from 'react';
 import { Treemap, ResponsiveContainer, Tooltip } from 'recharts';
 import { Card } from "@/components/ui/card";
+import { useContentStore } from '../store/contentStore';
 
 const CustomizedContent = (props) => {
   const { root, depth, x, y, width, height, index, name, value } = props;
@@ -56,10 +57,20 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-const TreemapVisualization = ({ data }) => {
+const TreemapVisualization = () => {
+  const { metaCreator, metaContent } = useContentStore();
+
+  const transformData = (data) => {
+    if (!data) return [];
+    return Object.entries(data).map(([name, size]) => ({ name, size }));
+  };
+
   const transformedData = {
     name: 'Content Aspirations',
-    children: Object.entries(data || {}).map(([name, size]) => ({ name, size })),
+    children: [
+      { name: 'Creator', children: transformData(metaCreator) },
+      { name: 'Content', children: transformData(metaContent) }
+    ]
   };
 
   const handleClick = (data) => {

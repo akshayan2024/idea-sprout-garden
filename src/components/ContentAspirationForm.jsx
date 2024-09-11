@@ -6,16 +6,16 @@ import { useContentStore } from '../store/contentStore';
 import { toast } from 'sonner';
 
 const ContentAspirationForm = () => {
-  const [tone, setTone] = useState('');
-  const [style, setStyle] = useState('');
+  const [creatorText, setCreatorText] = useState('');
+  const [contentText, setContentText] = useState('');
   const processContentAspiration = useContentStore((state) => state.processContentAspiration);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     const data = {
-      creator_text: `${tone} ${style}`,
-      content_text: '', // This will be filled with actual content later
+      creator_text: creatorText,
+      content_text: contentText,
     };
 
     try {
@@ -31,22 +31,22 @@ const ContentAspirationForm = () => {
       <h2 className="text-2xl font-semibold mb-4">Content Aspirations</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="tone" className="block text-sm font-medium text-gray-700 mb-1">Preferred Tone</label>
+          <label htmlFor="creatorText" className="block text-sm font-medium text-gray-700 mb-1">Creator Text</label>
           <Input
-            id="tone"
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
-            placeholder="e.g., Professional, Casual, Humorous"
+            id="creatorText"
+            value={creatorText}
+            onChange={(e) => setCreatorText(e.target.value)}
+            placeholder="Describe your content creation style and goals"
             required
           />
         </div>
         <div>
-          <label htmlFor="style" className="block text-sm font-medium text-gray-700 mb-1">Content Style</label>
+          <label htmlFor="contentText" className="block text-sm font-medium text-gray-700 mb-1">Content Text</label>
           <Input
-            id="style"
-            value={style}
-            onChange={(e) => setStyle(e.target.value)}
-            placeholder="e.g., Informative, Story-telling, Tutorial"
+            id="contentText"
+            value={contentText}
+            onChange={(e) => setContentText(e.target.value)}
+            placeholder="Describe your desired content output"
             required
           />
         </div>
