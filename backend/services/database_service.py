@@ -73,7 +73,7 @@ class DatabaseService:
         ON CONFLICT (user_id) 
         DO UPDATE SET meta_creator = EXCLUDED.meta_creator, meta_content = EXCLUDED.meta_content;
         """
-        self.cursor.execute(query, (user_id, json.dumps(meta_creator), json.dumps(meta_content)))
+        self.cursor.execute(query, (user_id, meta_creator, meta_content))
         self.conn.commit()
 
     # Retrieve user metadata
