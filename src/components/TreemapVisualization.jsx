@@ -8,7 +8,7 @@ const MindMapNode = ({ name, children }) => (
       <div className="ml-4">
         {Object.entries(children).map(([key, value]) => (
           <div key={key} className="mt-1">
-            <span className="font-medium">{key}:</span> {value.join(', ')}
+            <span className="font-medium">{key}:</span> {Array.isArray(value) ? value.join(', ') : value}
           </div>
         ))}
       </div>
@@ -17,6 +17,15 @@ const MindMapNode = ({ name, children }) => (
 );
 
 const TreemapVisualization = ({ data }) => {
+  if (!data || !data.creator || !data.content) {
+    return (
+      <Card className="p-6 bg-leaf-light border-leaf">
+        <h2 className="text-2xl font-semibold mb-4 text-leaf-dark">Content Aspiration Mind Map</h2>
+        <p>No data available for visualization.</p>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6 bg-leaf-light border-leaf">
       <h2 className="text-2xl font-semibold mb-4 text-leaf-dark">Content Aspiration Mind Map</h2>
