@@ -3,15 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuthStore } from '../store/authStore';
+import { toast } from 'sonner';
 
 const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      toast.success('Logged in successfully!');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,7 +49,9 @@ const AuthForm = () => {
             required
           />
         </div>
-        <Button type="submit">Login / Sign Up</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Processing...' : 'Login / Sign Up'}
+        </Button>
       </form>
     </Card>
   );
