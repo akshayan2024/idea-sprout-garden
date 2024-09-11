@@ -26,19 +26,11 @@ class ContentService:
     def store_generated_idea(self, user_id, input_text, generated_text):
         self.db_service.store_generated_idea(user_id, input_text, generated_text)
 
-    def process_content_aspiration(self, user_id, creator_text, content_text):
-        # Store the raw text in the database
+    def store_raw_text(self, user_id, creator_text, content_text):
         self.db_service.upsert_user_metadata(user_id, creator_text, content_text)
 
-        # Process the text for keywords (optional, can be used for additional features)
-        creator_keywords = self._extract_keywords(creator_text)
-        content_keywords = self._extract_keywords(content_text)
-
-        return {
-            "meta_creator": creator_text,
-            "meta_content": content_text,
-            "processed_keywords": creator_keywords + content_keywords
-        }
+    def get_user_ideas(self, user_id):
+        return self.db_service.get_user_generated_ideas(user_id)
 
     def _extract_keywords(self, text):
         tokens = word_tokenize(text.lower())

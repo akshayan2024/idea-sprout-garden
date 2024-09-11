@@ -66,23 +66,19 @@ def process_input():
     creator_text = data.get('creator_text')
     content_text = data.get('content_text')
     
-    # Process the input and generate metadata
-    processed_data = content_service.process_content_aspiration(creator_text, content_text)
-    
-    # Store the metadata in the user_metadata table
-    db_service.upsert_user_metadata(user_id, 'meta_creator', processed_data['meta_creator'])
-    db_service.upsert_user_metadata(user_id, 'meta_content', processed_data['meta_content'])
-    
-    # Generate and store an initial idea
-    initial_idea = content_service.generate_idea(processed_data['processed_keywords'])
-    db_service.store_generated_idea(user_id, processed_data['processed_keywords'], initial_idea)
+    # Process the input and store raw text
+    content_service.store_raw_text(user_id, creator_text, content_text)
     
     return jsonify({
         'status': 'success',
-        'message': 'Content aspirations processed and stored successfully',
-        'processed_data': processed_data,
-        'initial_idea': initial_idea
+        'message': 'Content aspirations stored successfully'
     })
+
+# Route to fetch user ideas
+@app.route('/user-ideas/<user_id>', methods=['GET'])
+def get_user_ideas(user_id):
+    ideas = content_service.get_user_ideas(user_id)
+    return jsonify(ideas)
 
 if __name__ == '__main__':
     app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
