@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
+import json
 
 class DatabaseService:
     def __init__(self):
@@ -65,18 +66,18 @@ class DatabaseService:
         return self.cursor.fetchall()
 
     # Add or update user metadata
-    def upsert_user_metadata(self, user_id, meta_key, meta_value):
+    def upsert_user_metadata(self, user_id, meta_creator, meta_content):
         query = """
-        INSERT INTO user_metadata (user_id, meta_key, meta_value)
+        INSERT INTO user_metadata (user_id, meta_creator, meta_content)
         VALUES (%s, %s, %s)
-        ON CONFLICT (user_id, meta_key) 
-        DO UPDATE SET meta_value = EXCLUDED.meta_value;
+        ON CONFLICT (user_id) 
+        DO UPDATE SET meta_creator = EXCLUDED.meta_creator, meta_content = EXCLUDED.meta_content;
         """
-        self.cursor.execute(query, (user_id, meta_key, meta_value))
+        self.cursor.execute(query, (user_id, json.dumps(meta_creator), json.dumps(meta_content)))
         self.conn.commit()
 
     # Retrieve user metadata
-    def get_user_metadata(self, user_id, meta_key):
-        query = "SELECT meta_value FROM user_metadata WHERE user_id = %s AND meta_key = %s;"
-        self.cursor.execute(query, (user_id, meta_key))
+    def get_user_metadata(self, user_id):
+        query = "SELECT meta_creator, meta_content FROM user_metadata WHERE user_id = %s;"
+        self.cursor.execute(query, (user_id,))
         return self.cursor.fetchone()
