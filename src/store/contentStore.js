@@ -6,12 +6,15 @@ export const useContentStore = create((set) => ({
   metaContent: null,
   generatedIdeas: [],
   existingIdeas: [],
+  hasUploadedFiles: false,
+  processedKeywords: null,
   processContentAspiration: async (data) => {
     try {
       const result = await contentService.processContentAspiration(data);
       set({ 
         metaCreator: result.meta_creator,
-        metaContent: result.meta_content
+        metaContent: result.meta_content,
+        processedKeywords: result.processed_keywords
       });
     } catch (error) {
       console.error('Content aspiration processing failed:', error);
@@ -32,5 +35,6 @@ export const useContentStore = create((set) => ({
     } catch (error) {
       console.error('Fetching existing ideas failed:', error);
     }
-  }
+  },
+  setHasUploadedFiles: (value) => set({ hasUploadedFiles: value }),
 }));

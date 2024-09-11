@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-const FileUploader = ({ onFileUpload }) => {
+const FileUploader = ({ onFileUpload, label }) => {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -22,8 +22,8 @@ const FileUploader = ({ onFileUpload }) => {
   };
 
   return (
-    <Card className="p-6 bg-leaf-light border-leaf">
-      <h2 className="text-2xl font-semibold mb-4 text-leaf-dark">Upload Text File</h2>
+    <Card className="p-4 bg-leaf-light border-leaf mb-4">
+      <h3 className="text-lg font-semibold mb-2 text-leaf-dark">{label}</h3>
       <input
         type="file"
         accept=".txt"
