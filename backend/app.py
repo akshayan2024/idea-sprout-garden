@@ -58,5 +58,12 @@ def logout():
     auth_service.logout(data['session_token'])
     return jsonify({'status': 'logged out'})
 
+# New route for processing content aspirations
+@app.route('/process-input', methods=['POST'])
+def process_input():
+    data = request.json
+    processed_data = content_service.process_content_aspiration(data['creator_text'], data['content_text'])
+    return jsonify(processed_data)
+
 if __name__ == '__main__':
     app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
