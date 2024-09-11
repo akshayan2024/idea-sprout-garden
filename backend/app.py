@@ -69,9 +69,13 @@ def process_input():
     # Process the input and store raw text
     content_service.store_raw_text(user_id, creator_text, content_text)
     
+    # Extract keywords and generate processed data
+    processed_data = content_service.process_content_aspiration(creator_text, content_text)
+    
     return jsonify({
         'status': 'success',
-        'message': 'Content aspirations stored successfully'
+        'message': 'Content aspirations processed successfully',
+        'processed_data': processed_data
     })
 
 # Route to fetch user ideas
