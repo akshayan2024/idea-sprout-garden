@@ -12,7 +12,7 @@ export const contentService = {
     }
   },
 
-  processUploadedData: async (userId) => {
+  processContentAspiration: async (userId) => {
     try {
       const response = await axios.post(`${API_URL}/process-aspiration`, { user_id: userId });
       return response.data;

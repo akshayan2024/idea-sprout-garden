@@ -78,25 +78,6 @@ def generate_ideas():
     app.logger.info(f"Ideas generated and stored for user: {data['user_id']}")
     return jsonify({'generated_idea': idea})
 
-@app.route('/check-session', methods=['GET'])
-def check_session():
-    session_token = request.args.get('session_token')
-    app.logger.info(f"Checking session for token: {session_token}")
-    if auth_service.validate_session(session_token):
-        app.logger.info(f"Session valid for token: {session_token}")
-        return jsonify({'status': 'valid'})
-    else:
-        app.logger.warning(f"Session invalid for token: {session_token}")
-        return jsonify({'status': 'invalid'})
-
-@app.route('/logout', methods=['POST'])
-def logout():
-    data = request.json
-    app.logger.info(f"Logging out user with session token: {data['session_token']}")
-    auth_service.logout(data['session_token'])
-    app.logger.info(f"User logged out successfully: {data['session_token']}")
-    return jsonify({'status': 'logged out'})
-
 @app.route('/user-ideas/<user_id>', methods=['GET'])
 def get_user_ideas(user_id):
     app.logger.info(f"Fetching ideas for user: {user_id}")
@@ -110,13 +91,6 @@ def log():
     log_level = getattr(logging, log_entry['level'])
     app.logger.log(log_level, f"[FRONTEND] {log_entry['message']}", extra=log_entry['data'])
     return jsonify({'status': 'success'})
-
-@app.route('/log-info', methods=['GET'])
-def log_info():
-    return jsonify({
-        'log_file_path': os.path.abspath(log_file_path),
-        'log_directory': os.path.abspath(log_directory)
-    })
 
 if __name__ == '__main__':
     app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')

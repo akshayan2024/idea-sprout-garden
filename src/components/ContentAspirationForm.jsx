@@ -11,9 +11,10 @@ const ContentAspirationForm = () => {
   const [contentText, setContentText] = useState('');
   const [creatorFileName, setCreatorFileName] = useState('');
   const [contentFileName, setContentFileName] = useState('');
-  const { processContentAspiration, setHasUploadedFiles, processUploadedData } = useContentStore();
+  const { uploadContentAspiration, processContentAspiration } = useContentStore();
   const { userProfile } = useAuthStore();
   const [isUploaded, setIsUploaded] = useState(false);
+  const [isProcessed, setIsProcessed] = useState(false);
 
   const handleCreatorFileUpload = (content, fileName) => {
     setCreatorText(content);
@@ -40,8 +41,7 @@ const ContentAspirationForm = () => {
     };
 
     try {
-      await processContentAspiration(data);
-      setHasUploadedFiles(true);
+      await uploadContentAspiration(data);
       setIsUploaded(true);
       toast.success('Content aspirations uploaded successfully!');
     } catch (error) {
@@ -51,7 +51,8 @@ const ContentAspirationForm = () => {
 
   const handleProcess = async () => {
     try {
-      await processUploadedData(userProfile.id);
+      await processContentAspiration(userProfile.id);
+      setIsProcessed(true);
       toast.success('Content aspirations processed successfully!');
     } catch (error) {
       toast.error('Failed to process content aspirations. Please try again.');
@@ -64,11 +65,16 @@ const ContentAspirationForm = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <FileUploader onFileUpload={handleCreatorFileUpload} label="Upload file about yourself" />
         <FileUploader onFileUpload={handleContentFileUpload} label="Upload file about your content aspirations" />
-        <Button type="submit" className="bg-brand-accent hover:bg-brand-accent/80 text-white">Submit Aspirations</Button>
-        {isUploaded && (
-          <Button onClick={handleProcess} className="bg-brand-accent hover:bg-brand-accent/80 text-white ml-4">Process Aspirations</Button>
-        )}
+        <div className="flex space-x-4">
+          <Button type="submit" className="bg-brand-accent hover:bg-brand-accent/80 text-white">Submit Aspirations</Button>
+          {isUploaded && !isProcessed && (
+            <Button onClick={handleProcess} className="bg-brand-accent hover:bg-brand-accent/80 text-white">Process Aspirations</Button>
+          )}
+        </div>
       </form>
+      {isProcessed && (
+        <p className="mt-4 text-green-500">Your content aspirations have been processed successfully!</p>
+      )}
     </Card>
   );
 };

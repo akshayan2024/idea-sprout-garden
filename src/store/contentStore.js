@@ -9,13 +9,14 @@ export const useContentStore = create((set) => ({
   existingIdeas: [],
   hasUploadedFiles: false,
   processedKeywords: null,
-  processContentAspiration: async (data) => {
+  uploadContentAspiration: async (data) => {
     try {
       logger.info('Uploading content aspiration', { userId: data.user_id });
       const result = await contentService.uploadContentAspiration(data);
       set({ 
         metaCreator: result.meta_creator,
         metaContent: result.meta_content,
+        hasUploadedFiles: true,
       });
       logger.info('Content aspiration uploaded successfully', { userId: data.user_id });
     } catch (error) {
@@ -23,14 +24,14 @@ export const useContentStore = create((set) => ({
       throw error;
     }
   },
-  processUploadedData: async (userId) => {
+  processContentAspiration: async (userId) => {
     try {
-      logger.info('Processing uploaded data', { userId });
-      const result = await contentService.processUploadedData(userId);
-      set({ processedKeywords: result.processed_keywords });
-      logger.info('Uploaded data processed successfully', { userId });
+      logger.info('Processing content aspiration', { userId });
+      const result = await contentService.processContentAspiration(userId);
+      set({ processedKeywords: result.processed_meta });
+      logger.info('Content aspiration processed successfully', { userId });
     } catch (error) {
-      logger.error('Processing uploaded data failed', { error: error.message, userId });
+      logger.error('Processing content aspiration failed', { error: error.message, userId });
       throw error;
     }
   },
@@ -55,9 +56,5 @@ export const useContentStore = create((set) => ({
       logger.error('Fetching existing ideas failed', { error: error.message, userId });
       throw error;
     }
-  },
-  setHasUploadedFiles: (value) => {
-    logger.info('Setting hasUploadedFiles', { value });
-    set({ hasUploadedFiles: value });
   },
 }));

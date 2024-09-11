@@ -13,38 +13,6 @@ class DatabaseService:
         )
         self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
 
-    def create_user(self, email, password_hash):
-        query = """
-        INSERT INTO users (email, password_hash) 
-        VALUES (%s, %s) RETURNING id;
-        """
-        self.cursor.execute(query, (email, password_hash))
-        self.conn.commit()
-        return self.cursor.fetchone()['id']
-
-    def get_user_by_email(self, email):
-        query = "SELECT * FROM users WHERE email = %s;"
-        self.cursor.execute(query, (email,))
-        return self.cursor.fetchone()
-
-    def create_session(self, user_id, session_token, expires_at):
-        query = """
-        INSERT INTO sessions (user_id, session_token, expires_at)
-        VALUES (%s, %s, %s);
-        """
-        self.cursor.execute(query, (user_id, session_token, expires_at))
-        self.conn.commit()
-
-    def get_session(self, session_token):
-        query = "SELECT * FROM sessions WHERE session_token = %s AND expires_at > NOW();"
-        self.cursor.execute(query, (session_token,))
-        return self.cursor.fetchone()
-
-    def delete_session(self, session_token):
-        query = "DELETE FROM sessions WHERE session_token = %s;"
-        self.cursor.execute(query, (session_token,))
-        self.conn.commit()
-
     def store_user_metadata(self, user_id, meta_creator, meta_content):
         query = """
         INSERT INTO user_metadata (user_id, meta_creator, meta_content)
