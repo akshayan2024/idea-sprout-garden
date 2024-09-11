@@ -41,12 +41,12 @@ const ContentAspirationForm = () => {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Content Aspirations</h2>
+    <Card className="p-6 bg-brand-medium text-foreground">
+      <h2 className="text-2xl font-semibold mb-4 text-brand-accent">Content Aspirations</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FileUploader onFileUpload={handleCreatorFileUpload} label="Upload file about yourself" />
         <FileUploader onFileUpload={handleContentFileUpload} label="Upload file about your content aspirations" />
-        <Button type="submit">Submit Aspirations</Button>
+        <Button type="submit" className="bg-brand-accent hover:bg-brand-accent/80 text-white">Submit Aspirations</Button>
       </form>
     </Card>
   );

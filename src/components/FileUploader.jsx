@@ -22,8 +22,8 @@ const FileUploader = ({ onFileUpload, label }) => {
   };
 
   return (
-    <Card className="p-4 bg-leaf-light border-leaf mb-4">
-      <h3 className="text-lg font-semibold mb-2 text-leaf-dark">{label}</h3>
+    <Card className="p-4 bg-brand-light border-brand-accent mb-4">
+      <h3 className="text-lg font-semibold mb-2 text-brand-accent">{label}</h3>
       <input
         type="file"
         accept=".txt"
@@ -31,7 +31,7 @@ const FileUploader = ({ onFileUpload, label }) => {
         ref={fileInputRef}
         className="hidden"
       />
-      <Button onClick={handleButtonClick} className="bg-leaf hover:bg-leaf-dark text-white">
+      <Button onClick={handleButtonClick} className="bg-brand-accent hover:bg-brand-accent/80 text-white">
         Choose File
       </Button>
     </Card>

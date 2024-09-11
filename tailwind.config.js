@@ -52,9 +52,10 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
         brand: {
-          skyBlue: "#87ceeb",
-          goldenYellow: "#f8c100",
-          lightGray: "#e3e3e3",
+          dark: "#1a1a1a",
+          medium: "#2a2a2a",
+          light: "#3a3a3a",
+          accent: "#4a90e2",
         },
       },
       borderRadius: {

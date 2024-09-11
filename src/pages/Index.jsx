@@ -34,31 +34,31 @@ const Index = () => {
   }, [processedKeywords, activeTab]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-skyBlue to-brand-goldenYellow p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center text-brand-lightGray">Content Idea Sprout Garden</h1>
+    <div className="min-h-screen bg-brand-dark p-8">
+      <h1 className="text-4xl font-bold mb-8 text-center text-brand-accent">Content Idea Sprout Garden</h1>
       <ProfileSection />
       <div className="max-w-3xl mx-auto">
         {userProfile?.hasExistingIdeas ? (
           <Dashboard />
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3 bg-brand-lightGray">
-              <TabsTrigger value="aspiration" className="data-[state=active]:bg-brand-skyBlue data-[state=active]:text-white">Content Aspiration</TabsTrigger>
-              <TabsTrigger value="visualization" className="data-[state=active]:bg-brand-skyBlue data-[state=active]:text-white">Visualization</TabsTrigger>
-              <TabsTrigger value="generator" className="data-[state=active]:bg-brand-skyBlue data-[state=active]:text-white">Idea Generator</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-brand-medium">
+              <TabsTrigger value="aspiration" className="data-[state=active]:bg-brand-accent data-[state=active]:text-white">Content Aspiration</TabsTrigger>
+              <TabsTrigger value="visualization" className="data-[state=active]:bg-brand-accent data-[state=active]:text-white">Visualization</TabsTrigger>
+              <TabsTrigger value="generator" className="data-[state=active]:bg-brand-accent data-[state=active]:text-white">Idea Generator</TabsTrigger>
             </TabsList>
             <TabsContent value="aspiration">
-              <Card className="bg-brand-lightGray border-brand-skyBlue">
+              <Card className="bg-brand-medium border-brand-accent">
                 <ContentAspirationForm />
               </Card>
             </TabsContent>
             <TabsContent value="visualization">
-              <Card className="bg-brand-lightGray border-brand-skyBlue">
+              <Card className="bg-brand-medium border-brand-accent">
                 <TreemapVisualization data={processedKeywords} />
               </Card>
             </TabsContent>
             <TabsContent value="generator">
-              <Card className="bg-brand-lightGray border-brand-skyBlue">
+              <Card className="bg-brand-medium border-brand-accent">
                 <ContentIdeaGenerator />
               </Card>
             </TabsContent>

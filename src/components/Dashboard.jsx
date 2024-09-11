@@ -8,16 +8,16 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 bg-brand-lightGray border-brand-skyBlue">
-        <h2 className="text-2xl font-semibold mb-4">Your Existing Ideas</h2>
-        <ul className="list-disc pl-5 space-y-2">
+      <Card className="p-6 bg-brand-medium border-brand-accent">
+        <h2 className="text-2xl font-semibold mb-4 text-brand-accent">Your Existing Ideas</h2>
+        <ul className="list-disc pl-5 space-y-2 text-foreground">
           {existingIdeas.map((idea, index) => (
-            <li key={index} className="text-gray-700">{idea}</li>
+            <li key={index}>{idea}</li>
           ))}
         </ul>
       </Card>
-      <Card className="p-6 bg-brand-lightGray border-brand-skyBlue">
-        <h2 className="text-2xl font-semibold mb-4">Generate New Ideas</h2>
+      <Card className="p-6 bg-brand-medium border-brand-accent">
+        <h2 className="text-2xl font-semibold mb-4 text-brand-accent">Generate New Ideas</h2>
         <ContentIdeaGenerator />
       </Card>
     </div>
