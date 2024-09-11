@@ -8,11 +8,19 @@ import ProfileSection from '../components/ProfileSection';
 import Dashboard from '../components/Dashboard';
 import { useAuthStore } from '../store/authStore';
 import { useContentStore } from '../store/contentStore';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { userProfile } = useAuthStore();
+  const { userProfile, isLoggedIn } = useAuthStore();
   const { userDictionary, fetchExistingIdeas, hasUploadedFiles, processedKeywords } = useContentStore();
   const [activeTab, setActiveTab] = React.useState('aspiration');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
   useEffect(() => {
     if (userProfile) {
@@ -32,6 +40,10 @@ const Index = () => {
       return () => clearTimeout(timer);
     }
   }, [processedKeywords, activeTab]);
+
+  if (!isLoggedIn) {
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="min-h-screen bg-brand-dark p-8">
