@@ -2,30 +2,20 @@ import { create } from 'zustand';
 import { authService } from '../services/authService';
 
 export const useAuthStore = create((set) => ({
-  isLoggedIn: false,
-  userProfile: null,
+  isLoggedIn: true, // Always set to true for now
+  userProfile: { id: 'dummy-user-id', email: 'dummy@example.com', name: 'Dummy User' },
   login: async (email, password) => {
-    try {
-      const userData = await authService.login(email, password);
-      set({ isLoggedIn: true, userProfile: userData });
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
+    // TODO: Implement with third-party authentication service
+    const userData = await authService.login(email, password);
+    set({ userProfile: userData });
   },
   logout: async () => {
-    try {
-      await authService.logout();
-      set({ isLoggedIn: false, userProfile: null });
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    // TODO: Implement with third-party authentication service
+    await authService.logout();
   },
   checkSession: async () => {
-    try {
-      const { isAuthenticated, profile } = await authService.checkSession();
-      set({ isLoggedIn: isAuthenticated, userProfile: profile });
-    } catch (error) {
-      console.error('Session check failed:', error);
-    }
+    // TODO: Implement with third-party authentication service
+    const { isAuthenticated, profile } = await authService.checkSession();
+    set({ userProfile: profile });
   }
 }));

@@ -1,48 +1,26 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000';
+// This file will be replaced with a third-party authentication service in the future
 
 export const authService = {
   login: async (email, password) => {
-    try {
-      // TODO: Replace with third-party auth service
-      const response = await axios.post(`${API_URL}/login`, { email, password }, { withCredentials: true });
-      return response.data;
-    } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
-      throw error;
-    }
+    // TODO: Implement third-party authentication service
+    console.log('Login functionality will be implemented with a third-party service');
+    return { id: 'dummy-user-id', email: email, name: 'Dummy User' };
   },
 
   register: async (email, password) => {
-    try {
-      // TODO: Replace with third-party auth service
-      const response = await axios.post(`${API_URL}/register`, { email, password }, { withCredentials: true });
-      return { ...response.data, isNewUser: true };
-    } catch (error) {
-      console.error('Registration error:', error.response?.data || error.message);
-      throw error;
-    }
+    // TODO: Implement third-party authentication service
+    console.log('Registration functionality will be implemented with a third-party service');
+    return { id: 'dummy-user-id', email: email, name: 'Dummy User', isNewUser: true };
   },
 
   logout: async () => {
-    try {
-      // TODO: Replace with third-party auth service
-      await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
-    } catch (error) {
-      console.error('Logout error:', error.response?.data || error.message);
-      throw error;
-    }
+    // TODO: Implement third-party authentication service
+    console.log('Logout functionality will be implemented with a third-party service');
   },
 
   checkSession: async () => {
-    try {
-      // TODO: Replace with third-party auth service
-      const response = await axios.get(`${API_URL}/check-session`, { withCredentials: true });
-      return response.data;
-    } catch (error) {
-      console.error('Session check error:', error.response?.data || error.message);
-      throw error;
-    }
+    // TODO: Implement third-party authentication service
+    console.log('Session check will be implemented with a third-party service');
+    return { isAuthenticated: true, profile: { id: 'dummy-user-id', email: 'dummy@example.com', name: 'Dummy User' } };
   }
 };

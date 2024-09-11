@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AuthForm from '../components/AuthForm';
 import ContentAspirationForm from '../components/ContentAspirationForm';
 import ContentIdeaGenerator from '../components/ContentIdeaGenerator';
 import TreemapVisualization from '../components/TreemapVisualization';
@@ -11,19 +10,15 @@ import { useAuthStore } from '../store/authStore';
 import { useContentStore } from '../store/contentStore';
 
 const Index = () => {
-  const { isLoggedIn, checkSession, userProfile } = useAuthStore();
+  const { userProfile } = useAuthStore();
   const { userDictionary, fetchExistingIdeas, hasUploadedFiles, processedKeywords } = useContentStore();
-  const [activeTab, setActiveTab] = useState('aspiration');
+  const [activeTab, setActiveTab] = React.useState('aspiration');
 
   useEffect(() => {
-    checkSession();
-  }, [checkSession]);
-
-  useEffect(() => {
-    if (isLoggedIn && userProfile) {
+    if (userProfile) {
       fetchExistingIdeas(userProfile.id);
     }
-  }, [isLoggedIn, userProfile, fetchExistingIdeas]);
+  }, [userProfile, fetchExistingIdeas]);
 
   useEffect(() => {
     if (hasUploadedFiles && processedKeywords) {
@@ -33,7 +28,7 @@ const Index = () => {
 
   useEffect(() => {
     if (processedKeywords && activeTab === 'visualization') {
-      const timer = setTimeout(() => setActiveTab('generator'), 5000); // Auto-switch to generator after 5 seconds
+      const timer = setTimeout(() => setActiveTab('generator'), 5000);
       return () => clearTimeout(timer);
     }
   }, [processedKeywords, activeTab]);
@@ -41,11 +36,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-skyBlue to-brand-goldenYellow p-8">
       <h1 className="text-4xl font-bold mb-8 text-center text-brand-lightGray">Content Idea Sprout Garden</h1>
-      {isLoggedIn && <ProfileSection />}
+      <ProfileSection />
       <div className="max-w-3xl mx-auto">
-        {!isLoggedIn ? (
-          <AuthForm />
-        ) : userProfile?.hasExistingIdeas ? (
+        {userProfile?.hasExistingIdeas ? (
           <Dashboard />
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
