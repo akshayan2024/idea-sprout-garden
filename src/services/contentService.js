@@ -19,5 +19,14 @@ export const contentService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  fetchExistingIdeas: async (userId) => {
+    try {
+      const response = await axios.get(`${API_URL}/user-ideas/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

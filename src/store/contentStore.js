@@ -5,6 +5,7 @@ export const useContentStore = create((set) => ({
   metaCreator: null,
   metaContent: null,
   generatedIdeas: [],
+  existingIdeas: [],
   processContentAspiration: async (data) => {
     try {
       const result = await contentService.processContentAspiration(data);
@@ -22,6 +23,14 @@ export const useContentStore = create((set) => ({
       set({ generatedIdeas: result.generated_idea });
     } catch (error) {
       console.error('Idea generation failed:', error);
+    }
+  },
+  fetchExistingIdeas: async (userId) => {
+    try {
+      const ideas = await contentService.fetchExistingIdeas(userId);
+      set({ existingIdeas: ideas });
+    } catch (error) {
+      console.error('Fetching existing ideas failed:', error);
     }
   }
 }));

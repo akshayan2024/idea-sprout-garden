@@ -6,16 +6,23 @@ import ContentAspirationForm from '../components/ContentAspirationForm';
 import ContentIdeaGenerator from '../components/ContentIdeaGenerator';
 import TreemapVisualization from '../components/TreemapVisualization';
 import ProfileSection from '../components/ProfileSection';
+import Dashboard from '../components/Dashboard';
 import { useAuthStore } from '../store/authStore';
 import { useContentStore } from '../store/contentStore';
 
 const Index = () => {
-  const { isLoggedIn, checkSession } = useAuthStore();
-  const { userDictionary } = useContentStore();
+  const { isLoggedIn, checkSession, userProfile } = useAuthStore();
+  const { userDictionary, fetchExistingIdeas } = useContentStore();
 
   useEffect(() => {
     checkSession();
   }, [checkSession]);
+
+  useEffect(() => {
+    if (isLoggedIn && userProfile) {
+      fetchExistingIdeas(userProfile.id);
+    }
+  }, [isLoggedIn, userProfile, fetchExistingIdeas]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-skyBlue to-brand-goldenYellow p-8">
@@ -24,6 +31,8 @@ const Index = () => {
       <div className="max-w-3xl mx-auto">
         {!isLoggedIn ? (
           <AuthForm />
+        ) : userProfile?.hasExistingIdeas ? (
+          <Dashboard />
         ) : (
           <Tabs defaultValue="aspiration" className="space-y-4">
             <TabsList className="grid w-full grid-cols-3 bg-brand-lightGray">
