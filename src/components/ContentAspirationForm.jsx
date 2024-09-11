@@ -8,14 +8,18 @@ import FileUploader from './FileUploader';
 const ContentAspirationForm = () => {
   const [creatorText, setCreatorText] = useState('');
   const [contentText, setContentText] = useState('');
+  const [creatorFileName, setCreatorFileName] = useState('');
+  const [contentFileName, setContentFileName] = useState('');
   const { processContentAspiration, setHasUploadedFiles } = useContentStore();
 
-  const handleCreatorFileUpload = (content) => {
+  const handleCreatorFileUpload = (content, fileName) => {
     setCreatorText(content);
+    setCreatorFileName(fileName);
   };
 
-  const handleContentFileUpload = (content) => {
+  const handleContentFileUpload = (content, fileName) => {
     setContentText(content);
+    setContentFileName(fileName);
   };
 
   const handleSubmit = async (e) => {
